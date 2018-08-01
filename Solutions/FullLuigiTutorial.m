@@ -1,4 +1,4 @@
-%% CoSMo 2017, Day 5 -- Model fitting & optimization tutorial with Luigi Acerbi
+%% CoSMo 2018, Day 5 -- Model fitting & optimization tutorial with Luigi Acerbi
 
 % Prepare data, from Konrad's tutorial
 
