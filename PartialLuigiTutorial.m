@@ -5,7 +5,7 @@
 baseFolder = fileparts(which('PartialLuigiTutorial.m'));
 addpath([baseFolder,filesep(),'utils']);
 
-%% Prepare data, from Konrad's tutorial
+%% Prepare Stevenson et al.'s (2011) data, from Konrad's tutorial
 
 % Load data into a struct
 data = load('M1_Stevenson_Binned.mat');
@@ -52,5 +52,29 @@ rng(1);
 
 %% Fit with BADS (download from: https://github.com/lacerbi/bads)
 
+%% Another problem: cart-pole inverse dynamics
 
-
+% % Add Konrad's folder
+% baseFolder = fileparts(which('PartialLuigiTutorial.m'));
+% addpath([baseFolder,filesep(),'Konrad']);
+% 
+% m1=1;
+% m2=1;
+% g=9.81;
+% l=0.3;
+% deltaT=0.0001;
+% duration=20;
+% 
+% X=[0 pi-pi/16]; %pi=up, 0/2pi=down
+% dotX=[0 0];
+% x0=[1 2 0.01];
+% LB = [-40,-40,-20];
+% UB = [40,40,20];
+% PLB = [-10,-10,-10];
+% PUB = [10,10,10];
+% options.Display = 'iter';
+% lossFun = @(x) brutalScore(x,X,dotX,m1,m2,g,l);
+% 
+% options.OutputFcn = @(x, optimValues, state) plotProfile(lossFun,x,LB,UB,64);
+% 
+% % Try and fit it with different optimizers!
