@@ -7,39 +7,32 @@ addpath([baseFolder,filesep(),'utils']);
 
 %% Prepare data, from Konrad's tutorial
 
-% Load data into a struct
-data = load('M1_Stevenson_Binned.mat');
+% Load data
+load M1_Stevenson_Binned
 
 % Remove all times where speeds are very slow
-isGood=find(data.handVel(1,:).^2+data.handVel(2,:).^2>.015);
-data.handVel=data.handVel(1:2,isGood);
-data.handPos=data.handPos(1:2,isGood);
-spikes_vec=data.spikes(:,isGood);
-data.time=data.time(isGood);
-angle_vec=atan2(data.handVel(1,:),data.handVel(2,:));
+isGood=find(handVel(1,:).^2+handVel(2,:).^2>.015);
+handVel=handVel(1:2,isGood);
+handPos=handPos(1:2,isGood);
+spikes_vec=spikes_vec(:,isGood);
+time=time(isGood);
+angle_vec=atan2(handVel(1,:),handVel(2,:));
 
 % Plot Raw Data
 nNeuron = 193  %193
 clf
 hold on
 plot(angle_vec,spikes_vec(nNeuron,:)+0.2*randn(size(spikes_vec(nNeuron,:))),'r.')
-xlabel('Angle (rad)');  xlim([-pi,pi]);
-ylabel('Spikes (Hz)');
-set(gca,'TickDir','out','Box','off');
-set(gcf,'Color','w');
 
-%% Model fitting!
-
+%% Part I: Model fitting
 % Fix random seed for reproducibility
 rng(1);
 
-% First, write the negative log likelihood (nLL) function in a separate file
-
 % Define exponential-cosine tuning curve
-tuningFun = @(params,angle) exp(params(1)+params(2).*cos(angle-params(3)));
+tuningFun = @(params,angle) exp(params(:,1)+params(:,2).*cos(angle-params(:,3)));
 
 % Alternative tuning curve, rectified cosine
-% tuningFun = @(params,angle) max(params(1)+params(2).*cos(angle-params(3)),1e-4);   % Why did I put 1e-4 and not 0?
+% tuningFun = @(params,angle) max(params(:,1)+params(:,2).*cos(angle-params(:,3)),1e-4);   % Why did I put 1e-4 and not 0?
 
 % Define handle to negative log likelihood function
 nLLfun = @(params) Tuning_nLL(params, spikes_vec(nNeuron,:), angle_vec, tuningFun);
@@ -70,6 +63,13 @@ options.OutputFcn = @(x, optimValues, state) plotProfile(nLLfun,x,PLB,PUB,[],{'b
 % bestParams
 % fvalCosExp
 
+%% Fit with CMA-ES
+
+[bestParams,fvalCosExp] = cmaes_wrapper('Tuning_nLL',x0,LB,UB,PLB,PUB,options,params,spikes_vec(nNeuron,:),angle_vec,tuningFun);
+bestParams
+fvalCosExp
+
+
 %% Fit with BADS (download from: https://github.com/lacerbi/bads)
 
 options.Display = 'iter';
@@ -80,13 +80,6 @@ options.PeriodicVars = 3;               % Preferred direction is periodic
 % plot(-pi:pi/80:pi, exp(bestParams(1)+bestParams(2)*cos((-pi:pi/80:pi)-bestParams(3))))
 bestParams
 fvalCosExp
-output
-
-%% Fit with CMA-ES (very powerful, but uses *a lot* of function evaluations)
-[bestParams,fvalCosExp,~,output] = cmaes_wrapper('Tuning_nLL',x0,LB,UB,PLB,PUB,[],spikes_vec(nNeuron,:),angle_vec,tuningFun);
-bestParams
-fvalCosExp
-output
 
 %% VBMC special preview! (to appear at: https://github.com/lacerbi/vbmc)
 

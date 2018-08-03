@@ -2,31 +2,28 @@
 
 %% Add utilities' folder to MATLAB path
 
-baseFolder = fileparts(which('PartialLuigiTutorial.m'));
-addpath([baseFolder,filesep(),'utils']);
+P = fileparts(mfilename('fullpath'));
+addpath(mfilename);
+
 
 %% Prepare data, from Konrad's tutorial
 
-% Load data into a struct
-data = load('M1_Stevenson_Binned.mat');
+% Load data
+load M1_Stevenson_Binned
 
 % Remove all times where speeds are very slow
-isGood=find(data.handVel(1,:).^2+data.handVel(2,:).^2>.015);
-data.handVel=data.handVel(1:2,isGood);
-data.handPos=data.handPos(1:2,isGood);
-spikes_vec=data.spikes(:,isGood);
-data.time=data.time(isGood);
-angle_vec=atan2(data.handVel(1,:),data.handVel(2,:));
+isGood=find(handVel(1,:).^2+handVel(2,:).^2>.015);
+handVel=handVel(1:2,isGood);
+handPos=handPos(1:2,isGood);
+spikes=spikes(:,isGood);
+time=time(isGood);
+angle=atan2(handVel(1,:),handVel(2,:));
 
 % Plot Raw Data
 nNeuron = 193  %193
 clf
 hold on
-plot(angle_vec,spikes_vec(nNeuron,:)+0.2*randn(size(spikes_vec(nNeuron,:))),'r.')
-xlabel('Angle (rad)');  xlim([-pi,pi]);
-ylabel('Spikes (Hz)');
-set(gca,'TickDir','out','Box','off');
-set(gcf,'Color','w');
+plot(angle,spikes(nNeuron,:)+0.2*randn(size(spikes(nNeuron,:))),'r.')
 
 %% Model fitting!
 
@@ -46,7 +43,7 @@ rng(1);
 
 %% Fit with fmincon (may get stuck!)
 
-%% Fit with CMA-ES (very powerful, but uses *a lot* of function evaluations)
+%% Fit with CMA-ES
 
 
 

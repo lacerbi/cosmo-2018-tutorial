@@ -1,4 +1,4 @@
-function [x,fval,outflag] = cmaes_wrapper(fun,x0,LB,UB,PLB,PUB,options,varargin)
+function [x,fval,outflag,output] = cmaes_wrapper(fun,x0,LB,UB,PLB,PUB,options,varargin)
 %CMAES_WRAPPER A wrapper for the CMA-ES algorithm
 %
 %  X = CMAES_WRAPPER(FUN,X0,LB,UB) returns the minimum X of a function with 
@@ -65,11 +65,11 @@ else
 end
 
 if ~ischar(fun); strfun = func2str(fun); else strfun = fun; end
-[~,~,counteval,outflag,out] = ...
+[~,~,counteval,outflag,output] = ...
     cmaes(strfun,x0,insigma,options,varargin{:});
 
 % Take best solution ever found
-x = out.solutions.bestever.x;
-fval = out.solutions.bestever.f;
+x = output.solutions.bestever.x;
+fval = output.solutions.bestever.f;
 
 if size(x0,2) > 1; x = x'; end
